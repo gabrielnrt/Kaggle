@@ -56,3 +56,26 @@ xTreino, xTeste, yTreino, yTeste = train_test_split(atributos, classe,
                                                     test_size = 0.3,
                                                     random_state = 0)
 xTreino
+#-------------------------------------------------------------------------------
+
+from sklearn.tree import DecisionTreeClassifier
+
+arvore = DecisionTreeClassifier()
+
+arvore.fit(xTreino, yTreino)
+
+previsoes = arvore.predict(xTeste)
+
+previsoes
+
+#------------------------------------------------------------------------------
+
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+matriz = confusion_matrix(previsoes, yTeste)
+
+matriz
+
+TaxaAcerto = accuracy_score(previsoes,yTeste)
+
+TaxaAcerto
