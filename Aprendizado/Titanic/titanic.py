@@ -79,3 +79,55 @@ matriz
 TaxaAcerto = accuracy_score(previsoes,yTeste)
 
 TaxaAcerto
+
+#-------------------------------------------------------------------------------
+
+df2 = read_csv('test.csv')
+
+df2
+
+df2.drop(columns = ColunasExcluidas,
+        inplace = True)
+
+df2
+
+df2[df2['PassengerId'].isnull()]
+df2[df2['Pclass'].isnull()]
+df2[df2['Sex'].isnull()]
+df2[df2['Age'].isnull()]
+df2[df2['SibSp'].isnull()]
+df2[df2['Parch'].isnull()]
+df2[df2['Fare'].isnull()]
+df2[df2['Embarked'].isnull()]
+
+
+MediaDasIdades = df2['Age'].mean()
+df2['Age'].fillna(value = MediaDasIdades, inplace = True)
+
+MediaFare = df2['Fare'].mean()
+df2['Fare'].fillna(value = MediaFare, inplace = True)
+
+
+X = df2.iloc[:,0:8].values
+
+codificador3 = LabelEncoder()
+codificador4 = LabelEncoder()
+
+X[:,2] = codificador3.fit_transform(X[:,2])
+X[:,7] = codificador4.fit_transform(X[:,7])
+
+
+Y = arvore.predict(X)
+
+Y
+
+dicionario = {'PassengerId': X[:,0], 'Survided': Y}
+
+from pandas import DataFrame
+
+RespostaObtida = DataFrame(dicionario)
+
+RespostaObtida
+RespostaObtida['Survided'].sum()
+
+RespostaObtida.to_csv('RespostaTitanic.csv', index = False)
