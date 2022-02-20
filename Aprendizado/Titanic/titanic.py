@@ -1,14 +1,24 @@
-from pandas import read_csv
+#-----------------------------------------------------------------------------
+# Importação das bibliotecas
 
+from pandas import read_csv, DataFrame
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+#----------------------------------------------------------------------------
+# Leitura dos dados de treino
 
 df = read_csv('train.csv')
 
-df
 
-#-----------------------------------------------------
-df2 = df.pop('Survided')
+#---------------------------------------------------------------------------
+# Tirando algumas colunas e movendo a classe (Survived) pro fim da tabela
 
-df['Survided'] = df2
+df2 = df.pop('Survived')
+
+df['Survived'] = df2
 
 
 ColunasExcluidas = ['Name', 'Ticket', 'Cabin']
@@ -16,14 +26,7 @@ ColunasExcluidas = ['Name', 'Ticket', 'Cabin']
 df.drop(columns = ColunasExcluidas,
         inplace = True)
 #------------------------------------------------------
-
-df[ df.duplicated(keep = False) ]
-
-df[df['PassengerId'].isnull()]
-df[df['Pclass'].isnull()]
-df[df['Sex'].isnull()]
-df[df['Age'].isnull()]
-df[df['Sibsp'].isnull()]
+# Células Nulas
 
 IdadeMedia = df['Age'].mean()
 df['Age'].fillna(value = IdadeMedia, inplace = True)
@@ -34,11 +37,10 @@ df['Embarked'].fillna(value = 'S', inplace = True)
 # value=moda o método não realiza a substituição.
 
 #-----------------------------------------------------------
+# Codificação das categorias
 
 atributos = df.iloc[:,0:8].values
 classe = df.iloc[:,8].values
-
-from sklearn.preprocessing import LabelEncoder
 
 codificador1 = LabelEncoder()
 codificador2 = LabelEncoder()
@@ -46,19 +48,15 @@ codificador2 = LabelEncoder()
 atributos[:,2] = codificador1.fit_transform(atributos[:,2])
 atributos[:,7] = codificador2.fit_transform(atributos[:,7])
 
-atributos
-
 #--------------------------------------------------------------
-
-from sklearn.model_selection import train_test_split
+# Particionamento dos dados
 
 xTreino, xTeste, yTreino, yTeste = train_test_split(atributos, classe,
                                                     test_size = 0.3,
                                                     random_state = 0)
-xTreino
-#-------------------------------------------------------------------------------
 
-from sklearn.tree import DecisionTreeClassifier
+#-------------------------------------------------------------------------------
+# Criação da árvore de decisão
 
 arvore = DecisionTreeClassifier()
 
@@ -66,40 +64,20 @@ arvore.fit(xTreino, yTreino)
 
 previsoes = arvore.predict(xTeste)
 
-previsoes
-
 #------------------------------------------------------------------------------
+# Avaliação da acurácia do modelo
 
-from sklearn.metrics import confusion_matrix, accuracy_score
-
-matriz = confusion_matrix(previsoes, yTeste)
-
-matriz
-
-TaxaAcerto = accuracy_score(previsoes,yTeste)
-
-TaxaAcerto
+# matriz = confusion_matrix(previsoes, yTeste)
+#
+# TaxaAcerto = accuracy_score(previsoes,yTeste)
 
 #-------------------------------------------------------------------------------
+# Implementação do modelo com os dados de teste
 
 df2 = read_csv('test.csv')
 
-df2
-
 df2.drop(columns = ColunasExcluidas,
         inplace = True)
-
-df2
-
-df2[df2['PassengerId'].isnull()]
-df2[df2['Pclass'].isnull()]
-df2[df2['Sex'].isnull()]
-df2[df2['Age'].isnull()]
-df2[df2['SibSp'].isnull()]
-df2[df2['Parch'].isnull()]
-df2[df2['Fare'].isnull()]
-df2[df2['Embarked'].isnull()]
-
 
 MediaDasIdades = df2['Age'].mean()
 df2['Age'].fillna(value = MediaDasIdades, inplace = True)
@@ -116,18 +94,10 @@ codificador4 = LabelEncoder()
 X[:,2] = codificador3.fit_transform(X[:,2])
 X[:,7] = codificador4.fit_transform(X[:,7])
 
-
 Y = arvore.predict(X)
 
-Y
-
-dicionario = {'PassengerId': X[:,0], 'Survided': Y}
-
-from pandas import DataFrame
+dicionario = {'PassengerId': X[:,0], 'Survived': Y}
 
 RespostaObtida = DataFrame(dicionario)
-
-RespostaObtida
-RespostaObtida['Survided'].sum()
 
 RespostaObtida.to_csv('RespostaTitanic.csv', index = False)
